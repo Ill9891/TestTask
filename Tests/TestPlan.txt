@@ -1,0 +1,139 @@
+﻿There is some inaccuracy for me here:
+Acceptance criteria says that "Users are able to create only one Study Group for a single Subject" but also "Users can also filter Study Groups by a given Subject".
+According to that there should not be more then one group per subject if I correctly understood that.
+
+
+
+Positive Test Cases for Study Group Feature:
+
+1. Test Case: Creating a Study Group Successfully
+Description: Verify that a study group can be created successfully with valid inputs.
+Steps:
+User initiates creation of a study group.
+User provides a name for the study group (between 5-30 characters).
+User selects a valid subject (Math, Chemistry, or Physics).
+User submits the creation request.
+Inputs:
+Name: "Chemistry group (random id)"
+Study Group ID: random for automation
+Subject: Chemistry
+Testing Level: Component Testing
+Regression: No (I would add it to the Smoke test suite. If creation of groups doesn't work, then no sense to run all other tests from this category)
+
+2. Test Case: Joining a Study Group
+Description: Test the functionality of joining an existing study group.
+Steps:
+Create a Study Group if no one exists (make shared step)
+User selects a study group to join.
+User submits the join request.
+Inputs:
+Study Group ID: from created group
+User ID: random for automation
+Testing Level: Component Testing
+Regression: Yes
+
+3. Test Case: Leaving a Study Group
+Description: Verify that a user can leave a study group they have joined.
+Steps:
+Create and join a Study Group if no one exists (make shared steps)
+User selects the study group to leave.
+User submits the leave request.
+Inputs:
+Study Group ID: from created group
+Testing Level: Component Testing
+Regression: Yes
+
+4. Test Case: Filtering Study Groups by Subject
+Description: Ensure that users can filter study groups by a specific subject.
+Steps:
+Create a Study Group if no one exists (make shared step)
+User selects a subject to filter study groups.
+User submits the filter request.
+Inputs:
+Subject: Math
+Testing Level: Component Testing, UI
+Regression: Yes
+
+5. Test Case: Sorting Study Groups by Creation Date
+Description: Verify that study groups can be sorted by creation date.
+Steps:
+Create a Study Groups if no one exists (make shared step)
+User selects the sorting option for creation date.
+User submits the sorting request.
+Inputs: None
+Testing Level: Component Testing, UI only
+Regression: Yes
+
+6. Test Case: Retrieving All Study Groups
+Description: Ensure that all existing study groups can be retrieved successfully.
+Steps:
+Create a Study Group if no one exists (make shared step)
+User requests to retrieve all study groups.
+Inputs: None
+Testing Level: Component Testing, UI
+Regression: Yes
+
+
+
+Negative Test Cases for Study Group Feature:
+
+1. Test Case: Creating Study Group with Invalid Name Length (2 tests, less then 5 and more then 30)
+Description: Ensure that study group creation fails if the name length is not within the specified range.
+Steps:
+User initiates creation of a study group.
+User provides a name that is less than 5 characters.
+User selects a valid subject.
+User submits the creation request.
+Inputs:
+Name: "Chem", "Invalid Study Group name that has more than thirty characters 1234"
+Subject: Physics
+Testing Level: Component Testing
+Regression: Yes
+
+
+2. Test Case: Creating Study Group with Invalid Subject
+Description: Validate that study group creation fails if an invalid subject is selected.
+Steps:
+User initiates creation of a study group.
+User provides a valid name.
+User selects an invalid subject.
+User submits the creation request.
+Inputs:
+Name: "Biology Study Group"
+Subject: Biology
+Testing Level: Component Testing
+Regression: Yes
+
+3. Test Case: Creating Duplicate Study Group For The Same Subject
+Description: Verify that users cannot create more than one study group for a single subject.
+Steps:
+User attempts to create a study group for a subject for which they already have a study group.
+Inputs:
+Name: "Math group (random id)"
+Subject: Math
+Testing Level: Component Testing
+Regression: Yes
+
+4. Test Case: Creating Duplicate Study Group With The Same Id
+Description: Verify that users cannot create more than one study group with the same Id.
+Steps:
+User attempts to create a study group with Id which was already created.
+Inputs:
+Name: "Math group (random id)", "Chemistry group (random id)"
+Study Group ID: the same for both groups
+Subject: Math, Chemistry
+Testing Level: Component Testing
+Regression: Yes
+
+
+
+SQL query:
+
+SELECT sg.*
+FROM StudyGroups sg
+WHERE sg.study_group_id IN (
+    SELECT u.study_group_id
+    FROM Users u
+    WHERE u.name LIKE 'M%'
+)
+ORDER BY sg.creation_date;
